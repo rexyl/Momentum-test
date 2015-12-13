@@ -200,7 +200,7 @@ int main(int argc, const char * argv[]) {
             output_format(winner_next_small);
             output_format(loser_next_big);
             output_format(loser_next_mid);
-            output_format(loser_next_smalll);
+            output_format(loser_next_small);
         }
     }
     return 0;
