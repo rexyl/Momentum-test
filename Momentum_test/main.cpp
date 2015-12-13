@@ -28,20 +28,21 @@ void avg_var(vector<double> &data, double &avg,double &variance){
 double t_test(vector<double> &data){
     double avg,variance;
     avg_var(data, avg, variance);
-    //double t = avg / (sqrt( (variance)/data.size() ));
-    double t = avg / sqrt(variance);
+    double t = avg /sqrt( (variance)/data.size() );
     return t;
 }
 struct stock_point {
     string code;
     double quater_price;
     double capitalization;
-    double increase;
+    double increase1;
+    double increase2;
     stock_point(){
         code = "";
         quater_price = 0;
         capitalization = 0;
-        increase = 0;
+        increase1 = 0;
+        increase2 = 0;
     }
 };
 typedef map<string,stock_point> timepoint;
@@ -61,15 +62,9 @@ bool cmp_capital(pair<stock_point, double> t1,pair<stock_point, double> t2){
     return t1.second<t2.second;
 }
 bool cmp_increse(pair<stock_point, double> t1,pair<stock_point, double> t2){
-    return t1.first.increase<t2.first.increase;
+    return t1.first.increase1<t2.first.increase1;
 }
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    vector<double> v= {1.1,3.1,4.5};
-    vector<double> v1= {1.5,2.1,8.5};
-    double a,var,t;
-    avg_var(v, a, var);
-    t = t_test(v);
     ifstream ifs("/Users/Rex/Desktop/Momentum_test/english_version.txt");
     stringstream ss;
     if(!ifs){
@@ -101,12 +96,14 @@ int main(int argc, const char * argv[]) {
         while(cnt<60 && ss>>num){
             data[cnt][code].code = code;
             data[cnt][code].quater_price = num;
-            if (last < FLT_EPSILON ) {
-                data[cnt][code].increase = NAN;
-            }
-            else {
-                data[cnt][code].increase = (num - last)/last;
-            }
+//            if (last < FLT_EPSILON ) {
+//                data[cnt][code].increase = NAN;
+//            }
+//            else {
+//                data[cnt][code].increase = (num - last)/last;
+//            }
+            data[cnt][code].increase1 = NAN;
+            data[cnt][code].increase2 = NAN;
             cnt++;
             last = num;
         }
@@ -116,6 +113,7 @@ int main(int argc, const char * argv[]) {
             cnt++;
         }
     }
+    
     //cout<<data[1]["000301.SZ"].increase<<endl;
     vector<pair<stock_point, double>> cap;
     
@@ -129,70 +127,65 @@ int main(int argc, const char * argv[]) {
     mid_diff.clear();
     big_diff.clear();
     int gap1 = 1,gap2=1;
-    for(int period = 1;period<59;period = period + gap1){
-        if(period + gap2 > 59)
-            break;
-        cap.clear();
-        for (auto &x:data[period]) {
-            if(x.second.capitalization>FLT_EPSILON && x.second.increase==x.second.increase)
-                cap.push_back({x.second,x.second.capitalization});
+    for(gap1 = 1;gap1!=5;gap1++){
+        for(gap2 = 1;gap2!=5;gap2++){
+            for (int i=0; i<data.size(); i++) {
+                if(i-gap1>=0 or i-gap2>=0){
+                    for(auto &x:data[i]){
+                        if(i-gap1>=0 &&data[i-gap1][x.second.code].quater_price != 0)
+                            x.second.increase1 = (x.second.quater_price/data[i-gap1][x.second.code].quater_price) -1;
+                        if(i-gap2>=0 &&data[i-gap2][x.second.code].quater_price != 0)
+                            x.second.increase2 = (x.second.quater_price/data[i-gap2][x.second.code].quater_price) -1;
+                    }
+                }
+            }
+            
+            for(int period = 1;period<59;period = period + 1){
+                if(period + gap2 > 59)
+                    break;
+                cap.clear();
+                for (auto &x:data[period]) {
+                    if(x.second.capitalization>FLT_EPSILON && x.second.increase1==x.second.increase1)
+                        cap.push_back({x.second,x.second.capitalization});
+                }
+                if (cap.empty()) {
+                    continue;
+                }
+                sort(cap.begin(), cap.end(), cmp_capital);
+                vector<pair<stock_point, double>> small(cap.begin(),cap.begin()+cap.size()/3);
+                vector<pair<stock_point, double>> mid(cap.begin()+cap.size()/3,cap.begin()+2*cap.size()/3);
+                vector<pair<stock_point, double>> big(cap.begin()+2*cap.size()/3,cap.end());
+                sort(big.begin(), big.end(), cmp_increse);
+                sort(mid.begin(), mid.end(), cmp_increse);
+                sort(small.begin(), small.end(), cmp_increse);
+                double sum1 = 0,sum2 = 0;
+                size_t size = big.size()/10;
+                for(int i=0;i<size;i++){
+                    sum1 += data[period+gap2][big[i].first.code].increase2;
+                    sum2 += data[period+gap2][big[big.size()-1-i].first.code].increase2;
+                }
+                winner_next_big.push_back(sum2/size);
+                loser_next_big.push_back(sum1/size);
+                big_diff.push_back((sum2-sum1)/size);
+                size = mid.size()/10;
+                for(int i=0,sum1=sum2=0;i<size;i++){
+                    sum1 += data[period+gap2][mid[i].first.code].increase2;
+                    sum2 += data[period+gap2][mid[mid.size()-1-i].first.code].increase2;
+                }
+                winner_next_mid.push_back(sum2/size);
+                loser_next_mid.push_back(sum1/size);
+                mid_diff.push_back((sum2-sum1)/size);
+                size = small.size()/10;
+                for(int i=0,sum1=sum2=0;i<size;i++){
+                    sum1 += data[period+gap2][small[i].first.code].increase2;
+                    sum2 += data[period+gap2][small[small.size()-1-i].first.code].increase2;
+                }
+                winner_next_small.push_back(sum2/size);
+                loser_next_small.push_back(sum1/size);
+                small_diff.push_back((sum2-sum1)/size);
+            }
+            cout<<"("<<gap1*3<<" "<<gap2*3<<") "<<t_test(mid_diff)<<endl;
         }
-        if (cap.empty()) {
-            continue;
-        }
-//        for(auto x:cap){
-//            cout<<x.first.code<<endl;
-//        }
-        sort(cap.begin(), cap.end(), cmp_capital);
-        vector<pair<stock_point, double>> small(cap.begin(),cap.begin()+cap.size()/3);
-        vector<pair<stock_point, double>> mid(cap.begin()+cap.size()/3,cap.begin()+2*cap.size()/3);
-        vector<pair<stock_point, double>> big(cap.begin()+2*cap.size()/3,cap.end());
-        sort(big.begin(), big.end(), cmp_increse);
-        sort(mid.begin(), mid.end(), cmp_increse);
-        sort(small.begin(), small.end(), cmp_increse);
-//        for(auto x:small){
-//            cout<<x.first.code<<endl;
-//        }
-        double sum1 = 0,sum2 = 0;
-        size_t size = big.size()/10;
-        for(int i=0;i<size;i++){
-            sum1 += data[period+1][big[i].first.code].increase;
-            sum2 += data[period+1][big[big.size()-1-i].first.code].increase;
-        }
-        winner_next_big.push_back(sum2/size);
-        loser_next_big.push_back(sum1/size);
-        big_diff.push_back((sum2-sum1)/size);
-        size = mid.size()/10;
-        for(int i=0,sum1=sum2=0;i<size;i++){
-            sum1 += data[period+1][mid[i].first.code].increase;
-            sum2 += data[period+1][mid[mid.size()-1-i].first.code].increase;
-        }
-        winner_next_mid.push_back(sum2/size);
-        loser_next_mid.push_back(sum1/size);
-        mid_diff.push_back((sum2-sum1)/size);
-        size = small.size()/10;
-        for(int i=0,sum1=sum2=0;i<size;i++){
-            sum1 += data[period+1][small[i].first.code].increase;
-            sum2 += data[period+1][small[small.size()-1-i].first.code].increase;
-        }
-        winner_next_small.push_back(sum2/size);
-        loser_next_small.push_back(sum1/size);
-        small_diff.push_back((sum2-sum1)/size);
-        //cout<<"worst is "<<sum1/10<<"\nbest is "<<sum2/10<<endl;
     }
-    //cout<<time_p[0]<<endl;
-    //cout<<data[0]["600004.SH"].quater_price<<" "<<data[0]["600000`.SH"].capitalization<<endl;
-//    for (int i=0; i<60; i++) {
-//        //cout<<data[i]["600008.SH"].increase<<endl;
-//        cout<<winner_next_small[i]<<endl;
-//    }
-    //cout<<winner_next_small[1]<<endl;
-    for(auto x:big_diff){
-        cout<<x<<endl;
-    }
-//    cout<<"In ("<<gap1*3<<gap2*3<<")\n";
-//    cout<<"     T-test for big: "<<t_test(big_diff)<<endl;
-//    cout<<"     T-test for mid: "<<t_test(mid_diff)<<endl;
-//    cout<<"     T-test for small: "<<t_test(small_diff)<<endl;
     return 0;
 }
