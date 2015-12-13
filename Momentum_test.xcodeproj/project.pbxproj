@@ -25,6 +25,10 @@
 /* Begin PBXFileReference section */
 		CDF5960B1C12B95F005FCD59 /* Momentum_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Momentum_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDF5960E1C12B95F005FCD59 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CDF74B681C1DE3F500460E72 /* english_version.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = english_version.txt; sourceTree = "<group>"; };
+		CDF74B691C1DE3F500460E72 /* english_version.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = english_version.xlsx; sourceTree = "<group>"; };
+		CDF74B6A1C1DE3F500460E72 /* result.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = result.xlsx; sourceTree = "<group>"; };
+		CDF74B6B1C1DE3F500460E72 /* total2.xlsx */ = {isa = PBXFileReference; lastKnownFileType = file; path = total2.xlsx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +61,10 @@
 		CDF5960D1C12B95F005FCD59 /* Momentum_test */ = {
 			isa = PBXGroup;
 			children = (
+				CDF74B681C1DE3F500460E72 /* english_version.txt */,
+				CDF74B691C1DE3F500460E72 /* english_version.xlsx */,
+				CDF74B6A1C1DE3F500460E72 /* result.xlsx */,
+				CDF74B6B1C1DE3F500460E72 /* total2.xlsx */,
 				CDF5960E1C12B95F005FCD59 /* main.cpp */,
 			);
 			path = Momentum_test;
@@ -237,6 +245,7 @@
 				CDF596141C12B95F005FCD59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

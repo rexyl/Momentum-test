@@ -1,9 +1,11 @@
 //
 //  main.cpp
 //  Momentum_test
-//
+//  testing for the momentum effect in China using data from 2000 to 2014,
+//  separately for large, small, and medium firms.
+
 //  Created by Lu Yang on 12/5/15.
-//  Copyright © 2015 Lu Yang. All rights reserved.
+//  All rights reserved.
 
 #include <iostream>
 #include <math.h>
@@ -64,6 +66,13 @@ bool cmp_capital(pair<stock_point, double> t1,pair<stock_point, double> t2){
 bool cmp_increse(pair<stock_point, double> t1,pair<stock_point, double> t2){
     return t1.first.increase1<t2.first.increase1;
 }
+void output_format(vector<double> v){
+    double sum=0;
+    for(auto x:v){
+        sum+=x;
+    }
+    cout<<sum/v.size()<<",("<<t_test(v)<<")\n";
+}
 int main(int argc, const char * argv[]) {
     ifstream ifs("/Users/Rex/Desktop/Momentum_test/english_version.txt");
     stringstream ss;
@@ -114,7 +123,6 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    //cout<<data[1]["000301.SZ"].increase<<endl;
     vector<pair<stock_point, double>> cap;
     
     winner_next_small.clear();
@@ -184,7 +192,15 @@ int main(int argc, const char * argv[]) {
                 loser_next_small.push_back(sum1/size);
                 small_diff.push_back((sum2-sum1)/size);
             }
-            cout<<"("<<gap1*3<<" "<<gap2*3<<") "<<t_test(mid_diff)<<endl;
+            output_format(big_diff);
+            output_format(small_diff);
+            output_format(mid_diff);
+            output_format(winner_next_big);
+            output_format(winner_next_mid);
+            output_format(winner_next_small);
+            output_format(loser_next_big);
+            output_format(loser_next_mid);
+            output_format(loser_next_smalll);
         }
     }
     return 0;
