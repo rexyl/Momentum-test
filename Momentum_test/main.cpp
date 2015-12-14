@@ -71,7 +71,7 @@ void output_format(vector<double> v){
     for(auto x:v){
         sum+=x;
     }
-    cout<<sum/v.size()<<",("<<t_test(v)<<")\n";
+    cout<<sum/v.size()<<",("<<t_test(v)<<")";
 }
 int main(int argc, const char * argv[]) {
     ifstream ifs("/Users/Rex/Desktop/Momentum_test/english_version.txt");
@@ -192,15 +192,26 @@ int main(int argc, const char * argv[]) {
                 loser_next_small.push_back(sum1/size);
                 small_diff.push_back((sum2-sum1)/size);
             }
-            output_format(big_diff);
             output_format(small_diff);
+            cout<<"\t";
             output_format(mid_diff);
-            output_format(winner_next_big);
-            output_format(winner_next_mid);
-            output_format(winner_next_small);
-            output_format(loser_next_big);
-            output_format(loser_next_mid);
-            output_format(loser_next_small);
+            cout<<"\t";
+            output_format(big_diff);
+            cout<<"\n";
+            
+//            output_format(winner_next_small);
+//            cout<<"\t";
+//            output_format(winner_next_mid);
+//            cout<<"\t";
+//            output_format(winner_next_big);
+//            cout<<"\n";
+            
+//            output_format(loser_next_small);
+//            cout<<"\t";
+//            output_format(loser_next_mid);
+//            cout<<"\t";
+//            output_format(loser_next_big);
+//            cout<<"\n";
         }
     }
     return 0;
