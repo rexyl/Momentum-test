@@ -73,8 +73,8 @@ void output_format(vector<double> v){
     }
     cout<<sum/v.size()<<",("<<t_test(v)<<")";
 }
-int main(int argc, const char * argv[]) {
-    ifstream ifs("/Users/Rex/Desktop/Momentum_test/english_version.txt");
+int main_fake(int ind) {
+    ifstream ifs("/Users/Rex/Desktop/Momentum_test/monthly.txt");
     stringstream ss;
     if(!ifs){
         cout<<"File open failed\n";
@@ -84,7 +84,7 @@ int main(int argc, const char * argv[]) {
     getline(ifs, line, '\n');
     int cnt = 1;
     ss<<line;ss>>tmp;
-    while(ss&&cnt++<=60){
+    while(ss&&cnt++<=180){
         ss>>tmp;
         if(tmp.size()<8) continue;
         time_p.push_back(tmp);
@@ -102,7 +102,7 @@ int main(int argc, const char * argv[]) {
             return 0;
         }
         cnt = 0;
-        while(cnt<60 && ss>>num){
+        while(cnt<180 && ss>>num){
             data[cnt][code].code = code;
             data[cnt][code].quater_price = num;
 //            if (last < FLT_EPSILON ) {
@@ -117,7 +117,7 @@ int main(int argc, const char * argv[]) {
             last = num;
         }
         cnt = 0;
-        while (cnt<60 && ss>>num) {
+        while (cnt<180 && ss>>num) {
             data[cnt][code].capitalization = num;
             cnt++;
         }
@@ -134,9 +134,9 @@ int main(int argc, const char * argv[]) {
     small_diff.clear();
     mid_diff.clear();
     big_diff.clear();
-    int gap1 = 1,gap2=1;
-    for(gap1 = 1;gap1!=5;gap1++){
-        for(gap2 = 1;gap2!=5;gap2++){
+    int gap1,gap2;
+    for(gap1 = 3;gap1!=15;gap1=gap1+3){
+        for(gap2 = 3;gap2!=15;gap2=gap2+3){
             for (int i=0; i<data.size(); i++) {
                 if(i-gap1>=0 or i-gap2>=0){
                     for(auto &x:data[i]){
@@ -148,8 +148,8 @@ int main(int argc, const char * argv[]) {
                 }
             }
             
-            for(int period = 1;period<59;period = period + 1){
-                if(period + gap2 > 59)
+            for(int period = 1;period<179;period = period + 1){
+                if(period + gap2 > 179)
                     break;
                 cap.clear();
                 for (auto &x:data[period]) {
@@ -172,47 +172,59 @@ int main(int argc, const char * argv[]) {
                     sum1 += data[period+gap2][big[i].first.code].increase2;
                     sum2 += data[period+gap2][big[big.size()-1-i].first.code].increase2;
                 }
-                winner_next_big.push_back(sum2/size);
-                loser_next_big.push_back(sum1/size);
-                big_diff.push_back((sum2-sum1)/size);
+                winner_next_big.push_back(sum2/size/gap2);
+                loser_next_big.push_back(sum1/size/gap2);
+                big_diff.push_back((sum2-sum1)/size/gap2);
                 size = mid.size()/10;
                 for(int i=0,sum1=sum2=0;i<size;i++){
                     sum1 += data[period+gap2][mid[i].first.code].increase2;
                     sum2 += data[period+gap2][mid[mid.size()-1-i].first.code].increase2;
                 }
-                winner_next_mid.push_back(sum2/size);
-                loser_next_mid.push_back(sum1/size);
-                mid_diff.push_back((sum2-sum1)/size);
+                winner_next_mid.push_back(sum2/size/gap2);
+                loser_next_mid.push_back(sum1/size/gap2);
+                mid_diff.push_back((sum2-sum1)/size/gap2);
                 size = small.size()/10;
                 for(int i=0,sum1=sum2=0;i<size;i++){
                     sum1 += data[period+gap2][small[i].first.code].increase2;
                     sum2 += data[period+gap2][small[small.size()-1-i].first.code].increase2;
                 }
-                winner_next_small.push_back(sum2/size);
-                loser_next_small.push_back(sum1/size);
-                small_diff.push_back((sum2-sum1)/size);
+                winner_next_small.push_back(sum2/size/gap2);
+                loser_next_small.push_back(sum1/size/gap2);
+                small_diff.push_back((sum2-sum1)/size/gap2);
             }
-            output_format(small_diff);
-            cout<<"\t";
-            output_format(mid_diff);
-            cout<<"\t";
-            output_format(big_diff);
-            cout<<"\n";
-            
-//            output_format(winner_next_small);
-//            cout<<"\t";
-//            output_format(winner_next_mid);
-//            cout<<"\t";
-//            output_format(winner_next_big);
-//            cout<<"\n";
-            
-//            output_format(loser_next_small);
-//            cout<<"\t";
-//            output_format(loser_next_mid);
-//            cout<<"\t";
-//            output_format(loser_next_big);
-//            cout<<"\n";
+            if(ind==0){
+                output_format(small_diff);
+                cout<<"\t";
+                output_format(mid_diff);
+                cout<<"\t";
+                output_format(big_diff);
+                cout<<"\n";
+            }
+            if(ind==1){
+                output_format(winner_next_small);
+                cout<<"\t";
+                output_format(winner_next_mid);
+                cout<<"\t";
+                output_format(winner_next_big);
+                cout<<"\n";
+            }
+            if(ind==2){
+                output_format(loser_next_small);
+                cout<<"\t";
+                output_format(loser_next_mid);
+                cout<<"\t";
+                output_format(loser_next_big);
+                cout<<"\n";
+            }
         }
+    }
+    ifs.close();
+    return 0;
+}
+int main(){
+    for (int i=0; i<3; i++) {
+        main_fake(i);
+        cout<<"\n\n";
     }
     return 0;
 }
